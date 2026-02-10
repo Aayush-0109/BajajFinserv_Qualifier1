@@ -29,15 +29,18 @@ app.use(errorHandler);
 
 let server: ReturnType<typeof app.listen> | null = null;
 
-if (env.NODE_ENV !== "test") {
+// prevent server from starting in test environment
+if (env.NODE_ENV !== "test" && !process.env.VERCEL) {
   server = app.listen(env.PORT, () => {
     console.log(`Server running on port ${env.PORT}`);
   });
 }
 
+// graceful shutdown
 const shutdown = (): void => {
   if (!server) {
     process.exit(0);
+    return;
   }
 
   server.close(() => {
